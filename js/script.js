@@ -11,7 +11,7 @@ var SITE_CONFIG = {
   formFallbackEmail: 'partnerships.sevia@proton.me',
 
   // Transparency page: GitHub account (user or organization) to list repos from.
-  githubUser: 'seviaafrica-creator',
+  githubUser: 'Sevia-Africa',
 
   // Donate page.
   geyserUrl: '',          // paste Sevia's Geyser project link to switch Geyser on

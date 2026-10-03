@@ -1655,9 +1655,51 @@
   <section class="explore-section" style="border-bottom:none; padding-top: 56px;">
     <div class="container" style="max-width: 980px;">
 
-      <div class="donate-grid">
+      <!-- BITCOIN PAYMENTS: Lightning + On-chain, side by side in one container -->
+      <div class="donate-bitcoin-container" id="donate-bitcoin">
+        <div class="donate-bitcoin-header">
+          <div class="donate-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"></path></svg>
+          </div>
+          <div>
+            <h3>Bitcoin Payments</h3>
+            <p>Already have a wallet open? Scan a code below, or tap the address on your phone to open it directly.</p>
+          </div>
+        </div>
 
-        <!-- OPTION 1: GYVAR (payment API, connected later) -->
+        <div class="donate-bitcoin-grid">
+
+          <!-- LIGHTNING (comes first) -->
+          <div class="donate-bitcoin-col" id="donate-lightning">
+            <span class="donate-pill" id="lightning-pill" hidden>Coming soon</span>
+            <h4>Lightning</h4>
+            <div class="donate-qr" id="lightning-qr" aria-hidden="true"></div>
+            <p class="donate-btc-label">Lightning address</p>
+            <div class="donate-addr-row">
+              <a class="donate-addr-link" id="lightning-address-link" href="#" target="_blank" rel="noopener noreferrer"><code id="lightning-address-text"></code></a>
+              <button type="button" class="copy-btn" id="lightning-copy-btn" data-copy-target="lightning-address-text">Copy</button>
+            </div>
+            <p class="donate-note-sm">Tap the address above to open it in your wallet app if you can't scan the code on this screen.</p>
+          </div>
+
+          <!-- ON-CHAIN -->
+          <div class="donate-bitcoin-col" id="donate-onchain">
+            <span class="donate-pill" id="onchain-pill" hidden>Coming soon</span>
+            <h4>On-chain</h4>
+            <div class="donate-qr" id="onchain-qr" aria-hidden="true"></div>
+            <p class="donate-btc-label">Bitcoin address</p>
+            <div class="donate-addr-row">
+              <a class="donate-addr-link" id="onchain-address-link" href="#" target="_blank" rel="noopener noreferrer"><code id="onchain-address-text"></code></a>
+              <button type="button" class="copy-btn" id="onchain-copy-btn" data-copy-target="onchain-address-text">Copy</button>
+            </div>
+            <p class="donate-note-sm">Tap the address above to open it in your wallet app if you can't scan the code on this screen.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- GYVAR beside OTHER WAYS TO GIVE -->
+      <div class="donate-grid">
         <div class="donate-option" id="donate-gyvar">
           <span class="donate-pill" id="gyvar-pill" hidden>Coming soon</span>
           <div class="donate-icon">
@@ -1686,30 +1728,15 @@
           </form>
         </div>
 
-        <!-- OPTION 2: GEYSER (link added later) -->
-        <div class="donate-option" id="donate-geyser">
-          <span class="donate-pill" id="geyser-pill" hidden>Coming soon</span>
+        <!-- OTHER WAYS TO GIVE -->
+        <div class="donate-other">
           <div class="donate-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>
           </div>
-          <h3>Donate via Geyser</h3>
-          <p>Give with Bitcoin or Lightning through Sevia's Geyser fundraising page.</p>
-          <p class="donate-note" style="margin-top: 0;">You'll be taken to Geyser, an external site with its own privacy policy.</p>
-          <a class="btn-primary donate-btn" id="geyser-btn" href="#" target="_blank" rel="noopener noreferrer" onclick="return handleGeyserClick(event)">DONATE ON GEYSER &#8599;</a>
-        </div>
-
-      </div>
-
-      <!-- OTHER WAYS TO GIVE -->
-      <div class="donate-other">
-        <div class="donate-icon" style="margin-bottom: 0; flex-shrink: 0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>
-        </div>
-        <div style="flex: 1;">
           <h3>Other Ways to Give</h3>
-          <p style="margin-bottom: 0;">Want to give in kind, sponsor a program, or use a different payment method? Get in touch and we'll find a way that works.</p>
+          <p>Want to give in kind, sponsor a program, or use a different payment method? Get in touch and we'll find a way that works.</p>
+          <a class="donate-other-link donate-btn" onclick="switchView('contact-page')">CONTACT US &rarr;</a>
         </div>
-        <a class="donate-other-link" onclick="switchView('contact-page')">Contact Us &rarr;</a>
       </div>
 
       <p class="donate-disclaimer" style="max-width: 640px; margin-left: auto; margin-right: auto;">Donations are processed by third-party providers, each with its own privacy policy. Any optional contact details you share are used only to thank you and follow up on your donation. <a href="assets/Sevia-Africa-Donor-Privacy-Policy.pdf" download="Sevia-Africa-Donor-Privacy-Policy.pdf" target="_blank">View Privacy Policy</a></p>
@@ -1951,6 +1978,7 @@
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

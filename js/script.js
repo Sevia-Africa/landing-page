@@ -11,11 +11,12 @@ var SITE_CONFIG = {
   formFallbackEmail: 'partnerships.sevia@proton.me',
 
   // Transparency page: GitHub account (user or organization) to list repos from.
-  githubUser: 'Sevia-Africa',
+  githubUser: 'seviaafrica-creator',
 
   // Donate page.
-  geyserUrl: '',          // paste Sevia's Geyser project link to switch Geyser on
-  gyvarEnabled: false     // set to true once startGyvarPayment() is connected
+  gyvarEnabled: false,       // set to true once startGyvarPayment() is connected
+  lightningAddress: 'seviaafrica@blink.sv',                      // leave empty to show "Coming soon"
+  bitcoinAddress: 'bc1qargv5da6z0ruklrsjxda5xd4y3y3tey5hhqmy3'    // leave empty to show "Coming soon"
 };
 
 /* ============================================================
@@ -292,12 +293,15 @@ function submitSeviaForm(event, formName, successMessage, onDone) {
    ============================================================ */
 (function () {
   // ---------------- DONATE PAGE ----------------
-  // Geyser and Gyvar are switched on from SITE_CONFIG at the top of this file.
+  // Gyvar, Lightning, and on-chain Bitcoin are switched on from SITE_CONFIG at the top of this file.
   // Gyvar: after connecting the payment API in startGyvarPayment() below,
   // set SITE_CONFIG.gyvarEnabled to true.
+  // Lightning / Bitcoin: paste an address into SITE_CONFIG.lightningAddress /
+  // SITE_CONFIG.bitcoinAddress to switch each one on (QR code + tap-to-pay link).
   var DONATE_CONFIG = {
     gyvarEnabled: SITE_CONFIG.gyvarEnabled,
-    geyserUrl: SITE_CONFIG.geyserUrl
+    lightningAddress: SITE_CONFIG.lightningAddress,
+    bitcoinAddress: SITE_CONFIG.bitcoinAddress
   };
 
   function startGyvarPayment(details) {
@@ -321,12 +325,7 @@ function submitSeviaForm(event, formName, successMessage, onDone) {
     return false;
   };
 
-  window.handleGeyserClick = function (e) {
-    if (!DONATE_CONFIG.geyserUrl) { e.preventDefault(); return false; }
-    return true;
-  };
-
-  // Until an option is connected it shows as "Coming soon" and does nothing,
+  // Until Gyvar is connected it shows as "Coming soon" and does nothing,
   // so no one is invited to enter details that go nowhere.
   var gBtn = document.getElementById('gyvar-btn');
   if (!DONATE_CONFIG.gyvarEnabled) {
@@ -339,19 +338,74 @@ function submitSeviaForm(event, formName, successMessage, onDone) {
     });
   }
 
-  var geyserBtn = document.getElementById('geyser-btn');
-  if (DONATE_CONFIG.geyserUrl) {
-    geyserBtn.href = DONATE_CONFIG.geyserUrl;
-  } else {
-    document.getElementById('geyser-pill').hidden = false;
-    geyserBtn.classList.add('is-pending');
-    geyserBtn.textContent = 'COMING SOON';
-    geyserBtn.setAttribute('aria-disabled', 'true');
+  // ---------------- BITCOIN PAYMENTS (Lightning + on-chain) ----------------
+  function renderQr(containerId, text) {
+    var el = document.getElementById(containerId);
+    if (!el || !window.QRCode) return;
+    el.innerHTML = '';
+    new QRCode(el, {
+      text: text,
+      width: 134,
+      height: 134,
+      colorDark: '#1E1309',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
   }
+
+  function setupBitcoinOption(opts) {
+    var col = document.getElementById(opts.colId);
+    var addr = opts.address;
+    if (!addr) {
+      col.classList.add('is-pending');
+      document.getElementById(opts.pillId).hidden = false;
+      return;
+    }
+    renderQr(opts.qrId, opts.uriPrefix + addr);
+    var textEl = document.getElementById(opts.textId);
+    textEl.textContent = addr;
+    var linkEl = document.getElementById(opts.linkId);
+    linkEl.href = opts.uriPrefix + addr;
+  }
+
+  setupBitcoinOption({
+    colId: 'donate-lightning', pillId: 'lightning-pill', qrId: 'lightning-qr',
+    textId: 'lightning-address-text', linkId: 'lightning-address-link',
+    address: DONATE_CONFIG.lightningAddress, uriPrefix: 'lightning:'
+  });
+
+  setupBitcoinOption({
+    colId: 'donate-onchain', pillId: 'onchain-pill', qrId: 'onchain-qr',
+    textId: 'onchain-address-text', linkId: 'onchain-address-link',
+    address: DONATE_CONFIG.bitcoinAddress, uriPrefix: 'bitcoin:'
+  });
+
+  // Copy-to-clipboard for both addresses
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var targetEl = document.getElementById(btn.getAttribute('data-copy-target'));
+      var text = targetEl ? targetEl.textContent.trim() : '';
+      if (!text) return;
+      var done = function () {
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {});
+      } else {
+        var tmp = document.createElement('textarea');
+        tmp.value = text;
+        document.body.appendChild(tmp);
+        tmp.select();
+        try { document.execCommand('copy'); done(); } catch (err) {}
+        document.body.removeChild(tmp);
+      }
+    });
+  });
 })();
 
 /* ============================================================
-   Donate page options (Gyvar / Geyser)
+   Donate page options (Bitcoin / Gyvar)
    ============================================================ */
 (function () {
   // GitHub account comes from SITE_CONFIG.githubUser (top of this file).

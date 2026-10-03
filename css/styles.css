@@ -1300,6 +1300,58 @@
 
     /* DONATE PAGE */
     .donate-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; align-items: stretch; }
+    .donate-grid-single { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+
+    /* Bitcoin payments: Lightning + on-chain in one container, two columns */
+    .donate-bitcoin-container {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: 0 14px 34px rgba(30,19,9,0.08);
+      margin-bottom: 24px;
+    }
+    .donate-bitcoin-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 26px; }
+    .donate-bitcoin-header .donate-icon { margin-bottom: 0; flex-shrink: 0; }
+    .donate-bitcoin-header p { font-size: 0.94rem; color: rgba(30,19,9,0.72); line-height: 1.55; margin: 0; }
+    .donate-bitcoin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .donate-bitcoin-col {
+      position: relative;
+      text-align: center;
+      padding: 22px 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(232,122,18,0.04);
+    }
+    .donate-bitcoin-col h4 { font-family: var(--mono); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rust); margin-bottom: 14px; }
+    .donate-qr {
+      width: 150px; height: 150px; margin: 0 auto 14px; padding: 8px;
+      background: #fff; border: 1px solid var(--line); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .donate-qr img, .donate-qr canvas, .donate-qr table { border-radius: 4px; }
+    .donate-btc-label { font-size: 0.72rem; color: rgba(30,19,9,0.55); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .donate-addr-row { display: flex; align-items: center; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .donate-addr-link { min-width: 0; }
+    .donate-addr-link code {
+      display: inline-block; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-family: var(--mono); font-size: 0.78rem; color: var(--ink); background: rgba(30,19,9,0.06);
+      padding: 6px 10px; border-radius: 6px; vertical-align: middle;
+    }
+    .copy-btn {
+      flex-shrink: 0; font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: #fff; color: var(--rust); cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(196,62,28,0.08); }
+    .donate-note-sm { font-size: 0.74rem; color: rgba(30,19,9,0.5); line-height: 1.45; margin: 12px 0 0; }
+    .donate-bitcoin-col.is-pending .donate-qr { opacity: 0.35; }
+    .donate-bitcoin-col.is-pending .donate-addr-row,
+    .donate-bitcoin-col.is-pending .donate-note-sm { display: none; }
+    @media (max-width: 600px) {
+      .donate-bitcoin-grid { grid-template-columns: 1fr; }
+    }
+
     .donate-option, .donate-other {
       position: relative;
       background: #fff;
@@ -1341,16 +1393,17 @@
     .donate-btn { display: block; width: 100%; margin-top: auto; box-sizing: border-box; text-align: center; text-decoration: none; cursor: pointer; }
     .donate-btn.is-pending { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
     .donate-other {
-      display: flex; align-items: center; gap: 22px; margin-top: 24px; padding: 26px 28px;
+      display: flex; flex-direction: column;
     }
-    .donate-other p { margin-bottom: 0; }
-    .donate-other-link { color: var(--rust); font-weight: 700; font-size: 0.95rem; cursor: pointer; white-space: nowrap; }
-    .donate-other-link:hover { text-decoration: underline; }
+    .donate-other-link {
+      display: block; width: 100%; margin-top: auto; box-sizing: border-box; text-align: center; text-decoration: none; cursor: pointer;
+      color: var(--rust); font-weight: 700; font-size: 0.95rem; background: transparent; border: 1.5px solid var(--rust); border-radius: 10px; padding: 13px 20px;
+    }
+    .donate-other-link:hover { background: rgba(196,62,28,0.08); }
     .donate-disclaimer { font-size: 0.78rem; color: rgba(30,19,9,0.55); text-align: center; margin-top: 26px; line-height: 1.55; }
     .donate-disclaimer a { color: var(--rust); }
     @media (max-width: 760px) {
       .donate-grid { grid-template-columns: 1fr; }
-      .donate-other { flex-direction: column; align-items: flex-start; gap: 14px; }
     }
     .radio-stack, .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px; }
     .checkbox-label { 

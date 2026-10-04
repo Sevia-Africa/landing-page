@@ -1706,26 +1706,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
           </div>
           <h3>Donate via Gyvar</h3>
-          <p>Choose an amount and complete your donation through Gyvar's secure checkout.</p>
-          <form id="gyvar-form" onsubmit="return submitGyvarDonation(event)">
-            <div class="form-group">
-              <label for="gyvar-amount">Donation amount</label>
-              <div class="donate-amount-row">
-                <select class="donate-currency" id="gyvar-currency">
-                  <option>USD</option>
-                  <option>SATS</option>
-                  <option>BTC</option>
-                </select>
-                <input type="text" id="gyvar-amount" inputmode="decimal" placeholder="0.00" autocomplete="off">
-              </div>
-            </div>
-            <div class="form-group" style="margin-bottom: 8px;">
-              <label for="gyvar-contact">Contact details for a thank-you (optional)</label>
-              <input type="text" id="gyvar-contact" placeholder="Name, email, or social handle">
-            </div>
-            <p class="donate-note" id="gyvar-status" role="status" aria-live="polite"></p>
-            <button type="submit" class="btn-primary donate-btn" id="gyvar-btn">DONATE VIA GYVAR &rarr;</button>
-          </form>
+          <p>Choose your amount and pay with Lightning, on-chain Bitcoin, or a stablecoin through Gyvar's secure checkout.</p>
+          <a class="btn-primary donate-btn" id="gyvar-btn" href="#" target="_blank" rel="noopener noreferrer">DONATE VIA GYVAR &rarr;</a>
         </div>
 
         <!-- OTHER WAYS TO GIVE -->

@@ -14,11 +14,10 @@ var SITE_CONFIG = {
   githubUser: 'seviaafrica-creator',
 
   // Donate page.
-  gyvarEnabled: false,       // set to true once startGyvarPayment() is connected
-  lightningAddress: 'seviaafrica@blink.sv',                      // leave empty to show "Coming soon"
-  bitcoinAddress: ''                                             // leave empty to show "Coming soon" — pending a non-API way to rotate
+  gyvarLink: 'https://pay.gyvar.com/l/5gzd6y77ek1p',   // Gyvar payment link — leave empty to show "Coming soon"
+  lightningAddress: 'seviaafrica@blink.sv',             // leave empty to show "Coming soon"
+  bitcoinAddress: ''                                    // leave empty to show "Coming soon" — pending a non-API way to rotate
 };
-
 
 /* ============================================================
    FORM SUBMISSION (used by every form on the site)
@@ -295,48 +294,25 @@ function submitSeviaForm(event, formName, successMessage, onDone) {
 (function () {
   // ---------------- DONATE PAGE ----------------
   // Gyvar, Lightning, and on-chain Bitcoin are switched on from SITE_CONFIG at the top of this file.
-  // Gyvar: after connecting the payment API in startGyvarPayment() below,
-  // set SITE_CONFIG.gyvarEnabled to true.
+  // Gyvar: paste a Gyvar payment link into SITE_CONFIG.gyvarLink to switch it on.
   // Lightning / Bitcoin: paste an address into SITE_CONFIG.lightningAddress /
   // SITE_CONFIG.bitcoinAddress to switch each one on (QR code + tap-to-pay link).
   var DONATE_CONFIG = {
-    gyvarEnabled: SITE_CONFIG.gyvarEnabled,
+    gyvarLink: SITE_CONFIG.gyvarLink,
     lightningAddress: SITE_CONFIG.lightningAddress,
     bitcoinAddress: SITE_CONFIG.bitcoinAddress
   };
 
-  function startGyvarPayment(details) {
-    // TODO: call Gyvar's payment API with details.amount, details.currency
-    // and (optionally) details.contact, then redirect to / open the checkout.
-  }
-
-  window.submitGyvarDonation = function (e) {
-    e.preventDefault();
-    if (!DONATE_CONFIG.gyvarEnabled) return false;
-    var status = document.getElementById('gyvar-status');
-    var amount = document.getElementById('gyvar-amount').value.trim();
-    var currency = document.getElementById('gyvar-currency').value;
-    var contact = document.getElementById('gyvar-contact').value.trim();
-    if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
-      status.textContent = 'Please enter a valid donation amount.';
-      return false;
-    }
-    status.textContent = '';
-    startGyvarPayment({ amount: amount, currency: currency, contact: contact });
-    return false;
-  };
-
-  // Until Gyvar is connected it shows as "Coming soon" and does nothing,
-  // so no one is invited to enter details that go nowhere.
+  // Until a Gyvar link is set it shows as "Coming soon" and does nothing,
+  // so no one is invited to click through to somewhere that doesn't exist.
   var gBtn = document.getElementById('gyvar-btn');
-  if (!DONATE_CONFIG.gyvarEnabled) {
+  if (DONATE_CONFIG.gyvarLink) {
+    gBtn.href = DONATE_CONFIG.gyvarLink;
+  } else {
     document.getElementById('gyvar-pill').hidden = false;
     gBtn.classList.add('is-pending');
     gBtn.textContent = 'COMING SOON';
-    gBtn.disabled = true;
-    ['gyvar-amount', 'gyvar-currency', 'gyvar-contact'].forEach(function (id) {
-      document.getElementById(id).disabled = true;
-    });
+    gBtn.setAttribute('aria-disabled', 'true');
   }
 
   // ---------------- BITCOIN PAYMENTS (Lightning + on-chain) ----------------

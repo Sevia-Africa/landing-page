@@ -1351,6 +1351,18 @@
     @media (max-width: 600px) {
       .donate-bitcoin-grid { grid-template-columns: 1fr; }
     }
+    .donate-sent-link {
+      display: block;
+      text-align: center;
+      margin-top: 22px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: rgba(30,19,9,0.55);
+      text-decoration: none;
+    }
+    .donate-sent-link:hover { color: var(--rust); text-decoration: underline; }
 
     .donate-option, .donate-other {
       position: relative;

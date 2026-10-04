@@ -16,7 +16,7 @@ var SITE_CONFIG = {
   // Donate page.
   gyvarEnabled: false,       // set to true once startGyvarPayment() is connected
   lightningAddress: 'seviaafrica@blink.sv',                      // leave empty to show "Coming soon"
-  bitcoinAddress: 'bc1qargv5da6z0ruklrsjxda5xd4y3y3tey5hhqmy3'    // leave empty to show "Coming soon"
+  bitcoinAddress:    // leave empty to show "Coming soon"
 };
 
 /* ============================================================

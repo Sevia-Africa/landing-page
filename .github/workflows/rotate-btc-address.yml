@@ -1,0 +1,76 @@
+name: Rotate Bitcoin donation address
+
+# Runs daily and whenever you trigger it manually from the Actions tab.
+# Pulls a brand-new, never-before-used on-chain address from the Sevia
+# Blink account and commits it straight into js/script.js, so the live
+# site always shows a fresh address without anyone running a backend.
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 03:00 UTC daily — edit if you want a different time
+  workflow_dispatch: {}    # adds a "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Request a new address from Blink
+        id: blink
+        env:
+          BLINK_API_KEY: ${{ secrets.BLINK_API_KEY }}
+          BLINK_WALLET_ID: ${{ secrets.BLINK_WALLET_ID }}
+        run: |
+          RESPONSE=$(curl -s -X POST https://api.blink.sv/graphql \
+            -H "Content-Type: application/json" \
+            -H "X-API-KEY: $BLINK_API_KEY" \
+            -d "{\"query\":\"mutation(\$input: OnChainAddressCreateInput!) { onChainAddressCreate(input: \$input) { address errors { message } } }\",\"variables\":{\"input\":{\"walletId\":\"$BLINK_WALLET_ID\"}}}")
+
+          echo "Blink response: $RESPONSE"
+
+          ADDRESS=$(echo "$RESPONSE" | node -e '
+            let data = "";
+            process.stdin.on("data", c => data += c);
+            process.stdin.on("end", () => {
+              try {
+                const json = JSON.parse(data);
+                const payload = json.data && json.data.onChainAddressCreate;
+                if (payload && payload.address) {
+                  process.stdout.write(payload.address);
+                } else {
+                  console.error("No address returned:", JSON.stringify(payload));
+                  process.exit(1);
+                }
+              } catch (e) {
+                console.error("Could not parse Blink response:", e.message);
+                process.exit(1);
+              }
+            });
+          ')
+
+          if [ -z "$ADDRESS" ]; then
+            echo "::error::Failed to get a new address from Blink"
+            exit 1
+          fi
+
+          echo "address=$ADDRESS" >> "$GITHUB_OUTPUT"
+
+      - name: Update SITE_CONFIG.bitcoinAddress
+        run: |
+          sed -i "s|bitcoinAddress: '[^']*'|bitcoinAddress: '${{ steps.blink.outputs.address }}'|" js/script.js
+
+      - name: Commit and push if the address changed
+        run: |
+          git config user.name "sevia-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add js/script.js
+          if git diff --cached --quiet; then
+            echo "Address unchanged, nothing to commit."
+          else
+            git commit -m "chore: rotate Bitcoin donation address"
+            git push
+          fi

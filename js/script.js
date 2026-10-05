@@ -11,7 +11,7 @@ var SITE_CONFIG = {
   formFallbackEmail: 'partnerships.sevia@proton.me',
 
   // Transparency page: GitHub account (user or organization) to list repos from.
-  githubUser: 'seviaafrica-creator',
+  githubUser: 'Sevia-Africa',
 
   // Donate page.
   gyvarLink: 'https://pay.gyvar.com/l/5gzd6y77ek1p',   // Gyvar payment link — leave empty to show "Coming soon"

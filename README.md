@@ -13,7 +13,7 @@ while preserving the folder structure exactly as it is. To preview locally, open
 | `thank-you.html` | Post-donation thank-you page |
 | `css/styles.css` | All styling |
 | `js/script.js` | All behaviour (navigation, forms, map, donate, GitHub feed) |
-| `assets/` | Images, favicon, and the Donor Privacy Policy PDF |
+| `assets/` | Images, favicon, and the Privacy Policy PDF |
 
 ## Site configuration
 

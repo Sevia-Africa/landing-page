@@ -3,11 +3,16 @@
    ============================================================ */
 var SITE_CONFIG = {
   // Forms (Contribute, Partnership, Funding, Contact).
-  // Paste your form-service URL here, e.g. 'https://formspree.io/f/xxxxxxxx'.
+  // Paste the address of the Sevia form relay (Cloudflare Worker) here, e.g.
+  // 'https://sevia-forms.YOUR-SUBDOMAIN.workers.dev'. It is safe to be public:
+  // it can only add form submissions and holds no key in this file.
   // While this is empty, forms open the visitor's email app with their
   // message pre-filled (sent to formFallbackEmail) instead of pretending
   // to send it.
-  formEndpoint: '',
+  formEndpoint: 'https://sevia-forms.seviaafrica.workers.dev',
+  // Optional spam check (Cloudflare Turnstile). Paste the SITE key (never the
+  // secret key) to switch it on. Leave empty to leave it off.
+  turnstileSiteKey: '',
   formFallbackEmail: 'partnerships.sevia@proton.me',
 
   // Transparency page: GitHub account (user or organization) to list repos from.
@@ -33,8 +38,15 @@ function collectFormData(form) {
     if (el.type === 'checkbox' || el.type === 'radio') {
       if (!el.checked) return;
       var own = el.closest('label');
-      var val = clean(own ? own.textContent : el.value) || el.value;
-      data[key] = data[key] ? data[key] + ', ' + val : val;
+      // Prefer the option's fixed value="..." (stable); fall back to the visible label text.
+      var fixedValue = el.getAttribute('value');
+      var val = (fixedValue !== null && fixedValue !== '') ? fixedValue : (clean(own ? own.textContent : el.value) || el.value);
+      if (el.type === 'radio') {
+        data[key] = val;
+      } else {
+        if (!Array.isArray(data[key])) data[key] = [];
+        data[key].push(val);   // ticked boxes are sent as a list
+      }
     } else if (el.value && el.value.trim()) {
       var k = key, n = 2;
       while (Object.prototype.hasOwnProperty.call(data, k)) { k = key + ' (' + n + ')'; n++; }
@@ -44,6 +56,50 @@ function collectFormData(form) {
   return data;
 }
 
+/* ------------------------------------------------------------
+   Spam guards (added when the forms were connected to the relay):
+   - a hidden "honeypot" box that people never see but bots fill in
+   - a timer, so instant submissions can be recognised as bots
+   - optional Cloudflare Turnstile (SITE_CONFIG.turnstileSiteKey)
+   ------------------------------------------------------------ */
+(function () {
+  function prepareForms() {
+    document.querySelectorAll('form').forEach(function (form) {
+      if (form.getAttribute('data-guarded')) return;
+      form.setAttribute('data-guarded', String(Date.now()));
+
+      var hp = document.createElement('input');
+      hp.type = 'text';
+      hp.name = '_hp';
+      hp.tabIndex = -1;
+      hp.autocomplete = 'off';
+      hp.setAttribute('aria-hidden', 'true');
+      hp.style.cssText = 'position:absolute;left:-9999px;top:auto;width:1px;height:1px;opacity:0;pointer-events:none;';
+      form.appendChild(hp);
+
+      if (SITE_CONFIG.turnstileSiteKey && window.turnstile) {
+        var box = document.createElement('div');
+        form.appendChild(box);
+        window.turnstile.render(box, { sitekey: SITE_CONFIG.turnstileSiteKey, appearance: 'interaction-only' });
+      }
+    });
+  }
+
+  function start() {
+    if (SITE_CONFIG.formEndpoint && SITE_CONFIG.turnstileSiteKey && !window.turnstile) {
+      var t = document.createElement('script');
+      t.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      t.async = true;
+      t.onload = prepareForms;
+      document.head.appendChild(t);
+    }
+    prepareForms();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
+
 function submitSeviaForm(event, formName, successMessage, onDone) {
   event.preventDefault();
   var form = event.target;
@@ -51,7 +107,10 @@ function submitSeviaForm(event, formName, successMessage, onDone) {
   var email = SITE_CONFIG.formFallbackEmail;
 
   if (SITE_CONFIG.formEndpoint) {
-    var payload = Object.assign({ _subject: 'Sevia Africa - ' + formName, form: formName }, data);
+    var openedAt = parseInt(form.getAttribute('data-guarded'), 10) || Date.now();
+    var payload = Object.assign({ _subject: 'Sevia Africa - ' + formName, form: formName, _elapsed: Date.now() - openedAt }, data);
+    var tsInput = form.querySelector('[name="cf-turnstile-response"]');
+    if (tsInput && tsInput.value) payload['cf-turnstile-response'] = tsInput.value;
     fetch(SITE_CONFIG.formEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -60,6 +119,8 @@ function submitSeviaForm(event, formName, successMessage, onDone) {
       if (!res.ok) throw new Error('bad response');
       alert(successMessage);
       form.reset();
+      form.setAttribute('data-guarded', String(Date.now()));
+      if (window.turnstile) { try { window.turnstile.reset(); } catch (e) {} }
       if (onDone) onDone();
     }).catch(function () {
       alert("Sorry, we couldn't send that just now. Please email us directly at " + email + ".");

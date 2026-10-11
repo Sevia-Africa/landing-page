@@ -289,7 +289,7 @@ function submitSeviaForm(event, formName, successMessage, onDone) {
       
 
 /* ============================================================
-   GitHub repositories feed (Transparency)
+   Donate page options (Bitcoin / Gyvar)
    ============================================================ */
 (function () {
   // ---------------- DONATE PAGE ----------------
@@ -382,7 +382,7 @@ function submitSeviaForm(event, formName, successMessage, onDone) {
 })();
 
 /* ============================================================
-   Donate page options (Bitcoin / Gyvar)
+   GitHub repositories feed (Transparency)
    ============================================================ */
 (function () {
   // GitHub account comes from SITE_CONFIG.githubUser (top of this file).

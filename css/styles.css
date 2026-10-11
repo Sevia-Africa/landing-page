@@ -1414,6 +1414,8 @@
     .donate-other-link:hover { background: rgba(196,62,28,0.08); }
     .donate-disclaimer { font-size: 0.78rem; color: rgba(30,19,9,0.55); text-align: center; margin-top: 26px; line-height: 1.55; }
     .donate-disclaimer a { color: var(--rust); }
+    .form-privacy-note { font-size: 0.8rem; line-height: 1.5; color: rgba(30,19,9,0.65); margin: 6px 0 14px; }
+    .form-privacy-note a { color: var(--rust); }
     @media (max-width: 760px) {
       .donate-grid { grid-template-columns: 1fr; }
     }
